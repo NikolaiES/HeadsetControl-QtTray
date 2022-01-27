@@ -1,8 +1,8 @@
+import logging
+import subprocess
 from PySide6.QtGui import QIcon, QAction
 from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
 from PySide6.QtCore import QTimer
-import subprocess
-import logging
 from PIL import Image, ImageFont, ImageDraw
 
 LOG_LEVEL = logging.INFO
@@ -42,7 +42,6 @@ class Application:
         :return:
         """
         self.app.setQuitOnLastWindowClosed(False)
-        # TODO
 
     def create_icon(self):
         """
@@ -78,7 +77,7 @@ class Application:
         image_draw = ImageDraw.Draw(image)
         image_draw.text(pos, icon, fill=color, font=font)
         image.save("Image.png")
-        self.icon = QIcon("Image.png")  # TODO cant do this before we have setup the application
+        self.icon = QIcon("Image.png")
 
     def check_status(self):
         """
@@ -89,7 +88,7 @@ class Application:
         if self.headset.capabilities is None:
             self.headset.run_command(["--capabilities", "-c"])
             if self.headset.capabilities is not None:
-                # TODO update tray menu with new capabilities.
+                self.tray.set_menu(self)
                 pass
 
         self.headset.run_command(["-b", "-c"])
@@ -119,7 +118,7 @@ class Tray(QSystemTrayIcon):
         # Quit
         self.quit = QAction("Quit")
         # light
-        self.light_off = QAction("Turn Light off")
+        self.light_off = QAction("Turn Light Off")
         self.light_on = QAction("Turn Light On")
         # Force refresh
         self.refresh = QAction("Refresh battery state")
@@ -147,8 +146,6 @@ class Tray(QSystemTrayIcon):
 
         # Set the menu
         self.setContextMenu(self.main_menu)
-
-
 
 
 class Headset:
