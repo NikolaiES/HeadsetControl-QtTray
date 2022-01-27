@@ -20,7 +20,7 @@ class Application:
         self.interval = 120000  # default interval for checking battery 30 seconds
         self.app = QApplication([])
         self.headset = Headset()
-        self.tray = Tray()
+        self.tray = Tray(self.headset)
         if not self.tray.isSystemTrayAvailable:
             logging.error("No Systemtray available to be used")
             exit(1)
@@ -101,6 +101,7 @@ class Application:
         logging.info("Updating tray icon")
         self.check_status()
         self.create_icon()
+        self.tray.battery.setText(self.headset.charge_status())
         self.tray.setIcon(self.icon)
         self.tray.setVisible(True)
 
@@ -110,7 +111,7 @@ class Tray(QSystemTrayIcon):
     Subclass of QSystemTrayIcon
     Extends it to set up the menu used by the tray icon.
     """
-    def __init__(self):
+    def __init__(self, headset):
         super().__init__()
         
         self.main_menu = QMenu()
@@ -122,6 +123,7 @@ class Tray(QSystemTrayIcon):
         self.light_on = QAction("Turn Light On")
         # Force refresh
         self.refresh = QAction("Refresh battery state")
+        self.battery = QAction(headset.charge_status())
 
     def set_menu(self, application):
         """
@@ -130,16 +132,17 @@ class Tray(QSystemTrayIcon):
         :return:
         """
 
-        if "l" in application.headset.capabilities:
+        if application.headset.capabilities is not None and "l" in application.headset.capabilities:
             self.light_on.triggered.connect(application.headset.turn_ligt_on)
             self.light_off.triggered.connect(application.headset.turn_light_off)
 
             self.main_menu.addAction(self.light_on)
             self.main_menu.addAction(self.light_off)
 
-        if "b" in application.headset.capabilities:
+        if application.headset.capabilities is not None and "b" in application.headset.capabilities:
             self.refresh.triggered.connect(application.tray_update)
             self.main_menu.addAction(self.refresh)
+            self.main_menu.addAction(self.battery)
 
         self.quit.triggered.connect(application.app.quit)
         self.main_menu.addAction(self.quit)
@@ -215,6 +218,18 @@ class Headset:
             self.capabilities = process.stdout.decode("UTF-8")
         # Other commands dont give output so we just continue hoping it worked
         # if we dont't get a error code.
+
+    def charge_status(self):
+        """
+        returns a string representation of the current charge status.
+        :return:
+        """
+        if self.charge == -2:
+            return "Disconnected"
+        elif self.charge == -1:
+            return "Charging"
+        else:
+            return f"{self.charge}%"
 
 
 if __name__ == "__main__":
