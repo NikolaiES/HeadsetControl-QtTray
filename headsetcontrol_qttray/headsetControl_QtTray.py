@@ -1,9 +1,10 @@
 import logging
 import subprocess
+
+from PIL import Image, ImageFont, ImageDraw
+from PySide6.QtCore import QTimer
 from PySide6.QtGui import QIcon, QAction
 from PySide6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
-from PySide6.QtCore import QTimer
-from PIL import Image, ImageFont, ImageDraw
 
 LOG_LEVEL = logging.INFO
 
@@ -13,6 +14,7 @@ class Application:
     Application class contains all the main logic of the application and is composite of the
     Headset class and tray class
     """
+
     def __init__(self):
         """
         Constructor setting up all required instances and logic of the application
@@ -72,7 +74,7 @@ class Application:
             else:
                 color = (255, 0, 0, 255)
 
-        font = ImageFont.truetype("font/DroidNerd.otf", font_size)
+        font = ImageFont.truetype("../font/DroidNerd.otf", font_size)
         image = Image.new('RGBA', (50, 50), color=(0, 0, 0, 0))
         image_draw = ImageDraw.Draw(image)
         image_draw.text(pos, icon, fill=color, font=font)
@@ -111,9 +113,10 @@ class Tray(QSystemTrayIcon):
     Subclass of QSystemTrayIcon
     Extends it to set up the menu used by the tray icon.
     """
+
     def __init__(self, headset):
         super().__init__()
-        
+
         self.main_menu = QMenu()
 
         # Quit
@@ -155,6 +158,7 @@ class Headset:
     """
     Represents the headset managed by HeadsetControl
     """
+
     def __init__(self):
         """
         Constructor  for the headset class
@@ -193,7 +197,8 @@ class Headset:
             logging.debug("run_headsetcontrol argument not list or list contains something that is not a string")
             return
 
-        if (self.capabilities is None and argument_list[0] != "--capabilities") or (self.capabilities is not None and argument_list[0].replace("-", "") not in self.capabilities):
+        if (self.capabilities is None and argument_list[0] != "--capabilities") or (
+                self.capabilities is not None and argument_list[0].replace("-", "") not in self.capabilities):
             logging.warning(f"{argument_list[0]} not in capabilities {self.capabilities}")
             return
 
@@ -232,10 +237,13 @@ class Headset:
             return f"{self.charge}%"
 
 
-if __name__ == "__main__":
+def main():
     # TODO check that headsetcontrol is actually installed
     # setup logging
     logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(message)s')
 
     app = Application()
     app.app.exec()
+
+if __name__ == "__main__":
+    main()

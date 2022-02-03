@@ -1,2 +1,4 @@
 Image.png
 .idea
+dist
+__pycache__/
