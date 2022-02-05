@@ -6,17 +6,16 @@ authors = ["Nikolai Eugen Sandvik <nikolai+git@sandvik.me>"]
 license = "GPL-3.0-only"
 readme = "README.md"
 repository= "https://github.com/NikolaiES/HeadsetControl-QtTray"
-include = ["font/*"]
 
 [tool.poetry.dependencies]
-python = "==3.10"
+python = ">=3.10,<3.11" 
 Pillow = "^9.0.0"
 PySide6 = "^6.2.2"
 
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
-poetry = 'headsetcontrol_qttray.HeadsetControl_QtTray:main'
+headsetcontrol_qttray = 'headsetcontrol_qttray.HeadsetControl_QtTray:main'
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
