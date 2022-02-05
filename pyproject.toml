@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "headsetcontrol-qttray"
-version = "0.2.0"
+version = "0.2.1"
 description = "Small system tray icon application written in python with QT to give easy access to information and settings for HeadsetControl (https://github.com/Sapd/HeadsetControl)"
 authors = ["Nikolai Eugen Sandvik <nikolai+git@sandvik.me>"]
 license = "GPL-3.0-only"
