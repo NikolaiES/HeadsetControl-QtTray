@@ -1,5 +1,7 @@
 import logging
 import subprocess
+import os
+import sys
 
 from PIL import Image, ImageFont, ImageDraw
 from PySide6.QtCore import QTimer
@@ -29,6 +31,13 @@ class Application:
         self.tray.set_menu(self)
 
         self.icon = None
+
+        self.image_path = os.getenv("XDG_CACHE_HOME") + "/"
+        if self.image_path is None:
+            self.image_path = f"{os.getenv('HOME')}/."
+            if self.image_path == "None/.":
+                logging.error("Could not find environment variable HOME or XDG_CACHE_HOME")
+                exit(1)
 
         self.setup()
         self.tray_update()
@@ -74,12 +83,12 @@ class Application:
             else:
                 color = (255, 0, 0, 255)
 
-        font = ImageFont.truetype("../font/DroidNerd.otf", font_size)
+        font = ImageFont.truetype(f"{os.path.abspath(os.path.dirname(__file__))}/DroidNerd.otf", font_size)
         image = Image.new('RGBA', (50, 50), color=(0, 0, 0, 0))
         image_draw = ImageDraw.Draw(image)
         image_draw.text(pos, icon, fill=color, font=font)
-        image.save("Image.png")
-        self.icon = QIcon("Image.png")
+        image.save(f"{self.image_path}headsetcontrol_tray_icon.png")
+        self.icon = QIcon(f"{self.image_path}headsetcontrol_tray_icon.png")
 
     def check_status(self):
         """
