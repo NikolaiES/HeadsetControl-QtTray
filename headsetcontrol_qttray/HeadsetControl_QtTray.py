@@ -212,16 +212,45 @@ class Headset:
     def turn_ligt_on(self):
         """
         Runs command to turn light on for headset that support.
-        :return:
         """
         self.run_command(["-l", "1", "-c"])
 
     def turn_light_off(self):
         """
         Runs command to turn light Off for headset that support.
-        :return:
         """
         self.run_command(["-l", "0", "-c"])
+
+    def sidetone_off(self):
+        """
+        Runs command to turn off sidetone
+        """
+        self.run_command(["-s", "0", "-c"])
+    
+    def sidetone_low(self):
+        """
+        Runs command to set sidetone to 32
+        """
+        self.run_command(["-s", "32", "-c"])
+
+    def sidetone_med(self):
+        """
+        Runs command to set sidetone to 64
+        """
+        self.run_command(["-s", "64", "-c"])
+
+    def sidetone_high(self):
+        """
+        Runs command to set sidetone to 96
+        """
+        self.run_command(["-s", "96", "-c"])
+
+    def sidetone_max(self):
+        """
+        Runs command to set sidetone to 128
+        """
+        self.run_command(["-s", "128", "-c"])
+
 
     def run_command(self, argument_list):
         """
