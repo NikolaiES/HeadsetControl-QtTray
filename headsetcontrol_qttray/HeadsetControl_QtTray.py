@@ -17,7 +17,6 @@
 import logging
 import subprocess
 import os
-import sys
 
 from PIL import Image, ImageFont, ImageDraw
 from PySide6.QtCore import QTimer
@@ -48,12 +47,17 @@ class Application:
 
         self.icon = None
 
-        self.image_path = os.getenv("XDG_CACHE_HOME") + "/"
+        self.image_path = os.getenv("XDG_CACHE_HOME")
         if self.image_path is None:
             self.image_path = f"{os.getenv('HOME')}/."
             if self.image_path == "None/.":
-                logging.error("Could not find environment variable HOME or XDG_CACHE_HOME")
+                logging.error(
+                    "Could not find environment variable HOME or XDG_CACHE_HOME"
+                )
                 exit(1)
+        else:
+            self.image_path += "/"
+
 
         self.setup()
         self.tray_update()
@@ -99,8 +103,10 @@ class Application:
             else:
                 color = (255, 0, 0, 255)
 
-        font = ImageFont.truetype(f"{os.path.abspath(os.path.dirname(__file__))}/DroidNerd.otf", font_size)
-        image = Image.new('RGBA', (50, 50), color=(0, 0, 0, 0))
+        font = ImageFont.truetype(
+            f"{os.path.abspath(os.path.dirname(__file__))}/DroidNerd.otf", font_size
+        )
+        image = Image.new("RGBA", (50, 50), color=(0, 0, 0, 0))
         image_draw = ImageDraw.Draw(image)
         image_draw.text(pos, icon, fill=color, font=font)
         image.save(f"{self.image_path}headsetcontrol_tray_icon.png")
@@ -160,14 +166,20 @@ class Tray(QSystemTrayIcon):
         :return:
         """
 
-        if application.headset.capabilities is not None and "l" in application.headset.capabilities:
+        if (
+            application.headset.capabilities is not None
+            and "l" in application.headset.capabilities
+        ):
             self.light_on.triggered.connect(application.headset.turn_ligt_on)
             self.light_off.triggered.connect(application.headset.turn_light_off)
 
             self.main_menu.addAction(self.light_on)
             self.main_menu.addAction(self.light_off)
 
-        if application.headset.capabilities is not None and "b" in application.headset.capabilities:
+        if (
+            application.headset.capabilities is not None
+            and "b" in application.headset.capabilities
+        ):
             self.refresh.triggered.connect(application.tray_update)
             self.main_menu.addAction(self.refresh)
             self.main_menu.addAction(self.battery)
@@ -218,20 +230,32 @@ class Headset:
         :return:
         """
 
-        if not isinstance(argument_list, list) and all(isinstance(elem, str) for elem in argument_list):
-            logging.debug("run_headsetcontrol argument not list or list contains something that is not a string")
+        if not isinstance(argument_list, list) and all(
+            isinstance(elem, str) for elem in argument_list
+        ):
+            logging.debug(
+                "run_headsetcontrol argument not list or list contains something that is not a string"
+            )
             return
 
         if (self.capabilities is None and argument_list[0] != "--capabilities") or (
-                self.capabilities is not None and argument_list[0].replace("-", "") not in self.capabilities):
-            logging.warning(f"{argument_list[0]} not in capabilities {self.capabilities}")
+            self.capabilities is not None
+            and argument_list[0].replace("-", "") not in self.capabilities
+        ):
+            logging.warning(
+                f"{argument_list[0]} not in capabilities {self.capabilities}"
+            )
             return
 
-        process = subprocess.run(args=["headsetcontrol", *argument_list], capture_output=True)
+        process = subprocess.run(
+            args=["headsetcontrol", *argument_list], capture_output=True
+        )
 
         if process.returncode != 0:
             self.connected = False
-            logging.debug(f"run_headsetcontrol return code {process.returncode} : {process.stderr}")
+            logging.debug(
+                f"run_headsetcontrol return code {process.returncode} : {process.stderr}"
+            )
             return
 
         if argument_list[0] == "-b":
@@ -265,10 +289,13 @@ class Headset:
 def main():
     # TODO check that headsetcontrol is actually installed
     # setup logging
-    logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(
+        level=LOG_LEVEL, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
 
     app = Application()
     app.app.exec()
+
 
 if __name__ == "__main__":
     main()
