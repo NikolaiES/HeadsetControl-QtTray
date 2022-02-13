@@ -158,6 +158,14 @@ class Tray(QSystemTrayIcon):
         # Force refresh
         self.refresh = QAction("Refresh battery state")
         self.battery = QAction(headset.charge_status())
+        # Sidetone
+        self.sidetone_menu = QMenu("Sidetone", parent=self.main_menu)
+        self.sidetone_off = QAction("Off")
+        self.sidetone_low = QAction("Low")
+        self.sidetone_med = QAction("Medium")
+        self.sidetone_high = QAction("High")
+        self.sidetone_max = QAction("Max")
+
 
     def set_menu(self, application):
         """
@@ -166,23 +174,32 @@ class Tray(QSystemTrayIcon):
         :return:
         """
 
-        if (
-            application.headset.capabilities is not None
-            and "l" in application.headset.capabilities
-        ):
-            self.light_on.triggered.connect(application.headset.turn_ligt_on)
-            self.light_off.triggered.connect(application.headset.turn_light_off)
+        if (application.headset.capabilities is not None):
+            if ("l" in application.headset.capabilities): # Capability controlling lights
+                self.light_on.triggered.connect(application.headset.turn_ligt_on)
+                self.light_off.triggered.connect(application.headset.turn_light_off)
 
-            self.main_menu.addAction(self.light_on)
-            self.main_menu.addAction(self.light_off)
+                self.main_menu.addAction(self.light_on)
+                self.main_menu.addAction(self.light_off)
 
-        if (
-            application.headset.capabilities is not None
-            and "b" in application.headset.capabilities
-        ):
-            self.refresh.triggered.connect(application.tray_update)
-            self.main_menu.addAction(self.refresh)
-            self.main_menu.addAction(self.battery)
+            if ("b" in application.headset.capabilities): # Capability checking battery
+                self.refresh.triggered.connect(application.tray_update)
+                self.main_menu.addAction(self.refresh)
+                self.main_menu.addAction(self.battery)
+
+            if ("s" in application.headset.capabilities): # Capability Sidetone
+                self.sidetone_off.triggered.connect(application.headset.sidetone_off)
+                self.sidetone_low.triggered.connect(application.headset.sidetone_low)
+                self.sidetone_med.triggered.connect(application.headset.sidetone_med)
+                self.sidetone_high.triggered.connect(application.headset.sidetone_high)
+                self.sidetone_max.triggered.connect(application.headset.sidetone_max)
+
+                self.sidetone_menu.addAction(self.sidetone_max)
+                self.sidetone_menu.addAction(self.sidetone_high)
+                self.sidetone_menu.addAction(self.sidetone_med)
+                self.sidetone_menu.addAction(self.sidetone_low)
+                self.sidetone_menu.addAction(self.sidetone_off) 
+                self.main_menu.addMenu(self.sidetone_menu)
 
         self.quit.triggered.connect(application.app.quit)
         self.main_menu.addAction(self.quit)
@@ -212,16 +229,45 @@ class Headset:
     def turn_ligt_on(self):
         """
         Runs command to turn light on for headset that support.
-        :return:
         """
         self.run_command(["-l", "1", "-c"])
 
     def turn_light_off(self):
         """
         Runs command to turn light Off for headset that support.
-        :return:
         """
         self.run_command(["-l", "0", "-c"])
+
+    def sidetone_off(self):
+        """
+        Runs command to turn off sidetone
+        """
+        self.run_command(["-s", "0", "-c"])
+    
+    def sidetone_low(self):
+        """
+        Runs command to set sidetone to 32
+        """
+        self.run_command(["-s", "32", "-c"])
+
+    def sidetone_med(self):
+        """
+        Runs command to set sidetone to 64
+        """
+        self.run_command(["-s", "64", "-c"])
+
+    def sidetone_high(self):
+        """
+        Runs command to set sidetone to 96
+        """
+        self.run_command(["-s", "96", "-c"])
+
+    def sidetone_max(self):
+        """
+        Runs command to set sidetone to 128
+        """
+        self.run_command(["-s", "128", "-c"])
+
 
     def run_command(self, argument_list):
         """
