@@ -198,8 +198,7 @@ class Tray(QSystemTrayIcon):
                 self.sidetone_menu.addAction(self.sidetone_high)
                 self.sidetone_menu.addAction(self.sidetone_med)
                 self.sidetone_menu.addAction(self.sidetone_low)
-                self.sidetone_menu.addAction(self.sidetone_off)
-                # FIXME bug where menu sometimes goes off screen 
+                self.sidetone_menu.addAction(self.sidetone_off) 
                 self.main_menu.addMenu(self.sidetone_menu)
 
         self.quit.triggered.connect(application.app.quit)
